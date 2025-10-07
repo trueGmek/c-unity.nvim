@@ -2,21 +2,25 @@ local M = {}
 
 ---@alias log_data {type:string, id:string, payload:{level:string, timestamp: string,message:string, stack_trace:string, file:string, line: integer}}
 
-
 local state = { floating = { buf = -1, win = -1 } }
--- Function to open a floating window
-local function open_floating_window(opts)
+vim.api.nvim_set_hl(0, 'cunityWarn', { fg = 'yellow', bg = 'NONE' })
+vim.api.nvim_set_hl(0, 'cunityError', { fg = 'red', bg = 'NONE' })
+
+local function create_buffer()
+  local buf = vim.api.nvim_create_buf(false, true)
+  vim.bo[buf].filetype = "cunitylog"
+  return buf
+end
+
+local open_floating_window = function(opts)
   opts = opts or {}
-  -- Get the editor dimensions
   local ui = vim.api.nvim_list_uis()[1]
   local width = ui.width
   local height = ui.height
 
-  -- Desired window size (80% width, some height ratio)
   local win_width = math.floor(width * 0.8)
   local win_height = math.floor(height * 0.8)
 
-  -- Center the window
   local row = math.floor((height - win_height) / 2)
   local col = math.floor((width - win_width) / 2)
 
@@ -24,13 +28,11 @@ local function open_floating_window(opts)
   if vim.api.nvim_buf_is_valid(opts.buf) then
     buf = opts.buf
   else
-    buf = vim.api.nvim_create_buf(false, true)
+    buf = create_buffer()
   end
-
 
   vim.bo[buf].modifiable = false
 
-  -- Window options
   local window_opts = {
     style = "minimal",
     relative = "editor",
@@ -38,11 +40,9 @@ local function open_floating_window(opts)
     height = win_height,
     row = row,
     col = col,
-    border = "rounded", -- you can use "single", "double", "shadow", etc.
+    border = "rounded",
   }
 
-
-  -- Open the floating window
   local win = vim.api.nvim_open_win(buf, true, window_opts)
   vim.wo[win].number = true
 
@@ -76,7 +76,7 @@ end
 ---@param message string
 M.append_message = function(message)
   if vim.api.nvim_buf_is_valid(state.floating.buf) == false then
-    state.floating.buf = vim.api.nvim_create_buf(false, true)
+    state.floating.buf = create_buffer()
   end
 
   append_text(state.floating.buf, message)
@@ -85,11 +85,11 @@ end
 ---@param data log_data
 M.append_log = function(data)
   if vim.api.nvim_buf_is_valid(state.floating.buf) == false then
-    state.floating.buf = vim.api.nvim_create_buf(false, true)
+    state.floating.buf = create_buffer()
   end
   local buf = state.floating.buf
 
-  local lines = { string.format("[%s][%s]: %s", data.payload.timestamp, data.payload.level, data.payload.message) }
+  local lines = { string.format("[%s][%s] %s", data.payload.timestamp, data.payload.level, data.payload.message) }
 
   if data.payload.stack_trace:len() > 0 then
     local stacktrace = vim.split(data.payload.stack_trace, '\n', { plain = true })
@@ -101,5 +101,13 @@ M.append_log = function(data)
   vim.bo[buf].modifiable = false
 end
 
+M.clear_buffer = function()
+  local buf = state.floating.buf
+  vim.bo[buf].modifiable = true
+  if vim.api.nvim_buf_is_valid(buf) then
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, {})
+  end
+  vim.bo[buf].modifiable = false
+end
 
 return M
