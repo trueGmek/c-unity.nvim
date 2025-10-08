@@ -1,5 +1,7 @@
 local M = {}
 
+local config = require("c-unity.config")
+
 ---@alias log_data {type:string, id:string, payload:{level:string, timestamp: string,message:string, stack_trace:string, file:string, line: integer}}
 ---@alias window_data  {buf: integer, win:integer}
 
@@ -11,7 +13,7 @@ vim.api.nvim_set_hl(0, 'cunityError', { fg = 'red', bg = 'NONE' })
 
 local function create_buffer()
   local buf = vim.api.nvim_create_buf(false, true)
-  vim.bo[buf].filetype = "cunitylog"
+  vim.bo[buf].filetype = config.window.filetype
   return buf
 end
 
@@ -22,20 +24,20 @@ local generate_window_config = function()
   local width = ui.width
   local height = ui.height
 
-  local win_width = math.floor(width * 0.8)
-  local win_height = math.floor(height * 0.8)
+  local win_width = math.floor(width * config.window.width_perct)
+  local win_height = math.floor(height * config.window.height_perct)
 
   local row = math.floor((height - win_height) / 2)
   local col = math.floor((width - win_width) / 2)
 
   return {
-    style = "minimal",
-    relative = "editor",
+    style = config.window.style,
+    relative = config.window.relative,
     width = win_width,
     height = win_height,
     row = row,
     col = col,
-    border = "rounded",
+    border = config.window.border,
   }
 end
 
@@ -125,8 +127,8 @@ M.toggle = function()
   if vim.api.nvim_win_is_valid(state.window.win) then
     vim.api.nvim_win_hide(state.window.win)
   else
-    local config = generate_window_config()
-    state.window = open_floating_window(state.window, config)
+    local win_config = generate_window_config()
+    state.window = open_floating_window(state.window, win_config)
   end
   scroll_to_bottom(state.window)
 end
