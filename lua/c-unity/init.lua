@@ -1,7 +1,7 @@
 local M = {}
 
 local window = require("c-unity.window")
-local pipe = require("c-unity.pipe_connection")
+local pipe = require("c-unity.connection")
 local generator = require("c-unity.payload_generator")
 
 M.window = window;
