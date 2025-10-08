@@ -1,6 +1,14 @@
-local M                        = {}
+local M           = {}
 
-local window                   = require("c-unity.window")
+local window      = require("c-unity.window")
+local payload_gen = require("c-unity.payload_generator")
+
+local _config     = { debug = false }
+
+M.setup           = function(config)
+  _config = config or {}
+end
+
 
 local ServerInPipe             = {
   pipe_name = "/tmp/unity-pipe-read",
@@ -76,9 +84,6 @@ local ServerOutPipe            = {
       end)
 
 
-      -- Set up an on_read callback to handle messages from Unity.
-      -- Note: On Linux, a single FIFO cannot be opened for read and write at the same time
-      -- by the same process. This works because one process reads and the other writes.
       self.pipe_connection.handle:read_start(function(err, data)
         if err then
           vim.schedule(function() vim.notify("Error reading from pipe: " .. err, vim.log.ERROR) end)
@@ -99,7 +104,7 @@ local ServerOutPipe            = {
               local isOk, result = pcall(vim.json.decode, line)
               if isOk then
                 window.append_log(result)
-              else
+              elseif _config.debug then
                 vim.notify("Could not parse incoming information: " .. data, vim.log.levels.ERROR)
               end
             end
@@ -139,9 +144,10 @@ M.disconnect_from_unity        = function()
   ServerInPipe:disconnect()
 end
 
----@param message string
-M.send_message                 = function(message)
-  ServerInPipe:write(message)
+M.send_recomipile              = function()
+  local command = "Recompile"
+  ServerInPipe:write(payload_gen.generate_command_json(command))
+  window.append_message(payload_gen.generate_command_message(command))
 end
 
 
