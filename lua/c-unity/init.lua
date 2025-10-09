@@ -54,7 +54,6 @@ local handle_broken_connection = function()
 end
 
 
----comment
 ---@param opts Config
 M.setup = function(opts)
   config.set(opts)

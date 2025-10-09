@@ -17,7 +17,6 @@ ServerReadPipe.is_connected  = function(self)
   return self.pipe_connection.handle and not self.pipe_connection.handle:is_closing()
 end
 
----comment
 ---@param self any
 ---@param message string
 ServerReadPipe.write         = function(self, message)
@@ -66,15 +65,28 @@ local ServerWritePipe        = {
   pipe_connection = {},
 }
 
----comment
 ---@param self table
 ---@return boolean
 ServerWritePipe.is_connected = function(self)
   return self.pipe_connection.handle and not self.pipe_connection.handle:is_closing()
 end
 
+---@param data string
+local handle_data            = function(data)
+  local lines = vim.split(data, '\n\n')
+  for _, line in ipairs(lines) do
+    local isOk, result = pcall(vim.json.decode, line)
+    vim.schedule(function()
+      if isOk then
+        window.append_packet(result)
+      else
+        log("Could not parse incoming information: " .. data, vim.log.levels.ERROR)
+      end
+    end)
+  end
+end
 
----comment
+
 ---@param self table
 ---@param on_connection_closed any
 ServerWritePipe.setup          = function(self, on_connection_closed)
@@ -114,17 +126,7 @@ ServerWritePipe.setup          = function(self, on_connection_closed)
       end
 
       if data then
-        vim.schedule(function()
-          local lines = vim.split(data, '\n\n')
-          for _, line in ipairs(lines) do
-            local isOk, result = pcall(vim.json.decode, line)
-            if isOk then
-              window.append_log(result)
-            else
-              log("Could not parse incoming information: " .. data, vim.log.levels.ERROR)
-            end
-          end
-        end)
+        handle_data(data)
       end
     end)
   end)

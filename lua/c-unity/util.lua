@@ -2,7 +2,6 @@ local M = {}
 
 local config = require("c-unity.config")
 
----comment
 ---@param message string
 ---@param level integer|nil
 M.log = function(message, level)

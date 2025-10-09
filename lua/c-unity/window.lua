@@ -2,7 +2,10 @@ local M = {}
 
 local config = require("c-unity.config")
 
----@alias log_data {type:string, id:string, payload:{level:string, timestamp: string,message:string, stack_trace:string, file:string, line: integer}}
+
+---@alias log_payload {level:string, timestamp: string,message:string, stack_trace:string, file:string, line: integer}
+---@alias response_payload {status: string, timestamp: string, response: string, data: table}
+---@alias packet_data {type:"command"|"response"|"log", id:string, payload:log_payload|response_payload}
 ---@alias window_data  {buf: integer, win:integer}
 
 ---@type {window: window_data}
@@ -75,7 +78,7 @@ local function append_text(buf, msg)
   vim.bo[buf].modifiable = false
 end
 
----@param data log_data
+---@param data packet_data
 local append_log = function(data)
   local buf = state.window.buf
   local lines = { string.format("[%s][%s] %s", data.payload.timestamp, data.payload.level, data.payload.message) }
@@ -84,6 +87,21 @@ local append_log = function(data)
     local stacktrace = vim.split(data.payload.stack_trace, '\n', { plain = true })
     vim.list_extend(lines, stacktrace)
   end
+  vim.bo[buf].modifiable = true
+  vim.api.nvim_buf_set_lines(buf, -1, -1, false, lines)
+  vim.bo[buf].modifiable = false
+end
+
+-- [18:43:07][Unity] Status: SUCCESS, Message: 
+--response
+
+---@param data packet_data
+local append_response = function(data)
+  local separator = "----"
+  local buf = state.window.buf
+  local message = string.format("[%s][Unity] Status: %s, Message: %s", data.payload.timestamp, data.payload.status, data.payload.response)
+  local lines = vim.split(separator .. '\n' .. message .. '\n' .. separator .. '\n', '\n')
+
   vim.bo[buf].modifiable = true
   vim.api.nvim_buf_set_lines(buf, -1, -1, false, lines)
   vim.bo[buf].modifiable = false
@@ -101,13 +119,17 @@ end
 
 
 ---Appends the log to the buffer
----@param data log_data
-M.append_log = function(data)
+---@param data packet_data
+M.append_packet = function(data)
   if vim.api.nvim_buf_is_valid(state.window.buf) == false then
     state.window.buf = create_buffer()
   end
 
-  append_log(data)
+  if data.type == "log" then
+    append_log(data)
+  elseif "response" then
+    append_response(data)
+  end
 end
 
 ---Clears the log window
