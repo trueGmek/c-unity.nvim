@@ -3,20 +3,21 @@ local config = {}
 ---@class Config
 ---@field  debug boolean
 ---@field loop {timeout: number, repeat_time: number, limit:integer}
----@field connection {server_read_pipe_name: string, server_write_pipe_name: string}
+---@field connection {server_read_pipe_name: string, server_write_pipe_name: string, handle_broken_connection: function}
 ---@field window {border?: 'none'|'single'|'double'|'rounded'|'solid'|'shadow'|string[], width_perct:number, height_perct: number, filetype: string}
 
 
-config.debug = true
+config.debug = false
 config.loop = {
   timeout = 1000,
-  repeat_time = 1000,
+  repeat_time = 5000,
   limit = 100
 }
 
 config.connection = {
   server_read_pipe_name = "/tmp/unity-pipe-read",
-  server_write_pipe_name = "/tmp/unity-pipe-write"
+  server_write_pipe_name = "/tmp/unity-pipe-write",
+  handle_broken_connection = function() end
 }
 
 config.window = {

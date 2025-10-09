@@ -7,7 +7,8 @@ local config = require("c-unity.config")
 ---@param level integer|nil
 M.log = function(message, level)
   if config.debug then
-    vim.notify(message, level)
+    local data = string.format("[%s] %s", os.date("%H:%M:%S"), message)
+    vim.notify(data, level)
   end
 end
 

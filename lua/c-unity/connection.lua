@@ -6,21 +6,21 @@ local payload_gen = require("c-unity.payload_generator")
 
 
 ---The pipe from which the server reads
-local ServerReadPipe           = {
+local ServerReadPipe         = {
   pipe_name = config.connection.server_read_pipe_name,
   pipe_connection = {},
 }
 
 ---@param self table
 ---@return boolean: Is the pipe connected
-ServerReadPipe.is_connected    = function(self)
+ServerReadPipe.is_connected  = function(self)
   return self.pipe_connection.handle and not self.pipe_connection.handle:is_closing()
 end
 
 ---comment
 ---@param self any
 ---@param message string
-ServerReadPipe.write           = function(self, message)
+ServerReadPipe.write         = function(self, message)
   if not self:is_connected() then
     log("Not connected to Unity. Please connect first.", vim.log.WARN)
     return
@@ -33,7 +33,7 @@ ServerReadPipe.write           = function(self, message)
   end)
 end
 
-ServerReadPipe.setup           = function(self)
+ServerReadPipe.setup         = function(self)
   if self:is_connected() then
     log("Already connected to this pipe: " .. self.pipe_name, vim.log.INFO)
     return
@@ -51,7 +51,7 @@ ServerReadPipe.setup           = function(self)
   end)
 end
 
-ServerReadPipe.disconnect      = function(self)
+ServerReadPipe.disconnect    = function(self)
   if self.pipe_connection.handle and not self.pipe_connection.handle:is_closing() then
     self.pipe_connection.handle:close()
     log("Disconnected from the pipe: " .. self.pipe_name, vim.log.INFO)
@@ -61,14 +61,22 @@ ServerReadPipe.disconnect      = function(self)
 end
 
 ---The pipe to which the server writes
-local ServerWritePipe          = {
+local ServerWritePipe        = {
   pipe_name = config.connection.server_write_pipe_name,
   pipe_connection = {},
 }
 
-ServerWritePipe.is_connected   = function(self)
+---comment
+---@param self table
+---@return boolean
+ServerWritePipe.is_connected = function(self)
   return self.pipe_connection.handle and not self.pipe_connection.handle:is_closing()
 end
+
+
+---comment
+---@param self table
+---@param on_connection_closed any
 ServerWritePipe.setup          = function(self, on_connection_closed)
   on_connection_closed = on_connection_closed or function() end
   if self.pipe_connection.handle and not self.pipe_connection.handle:is_closing() then
@@ -134,14 +142,14 @@ end
 local handle_closed_connection = function()
   vim.schedule(
     function()
-      vim.notify("Connection was closed", vim.log.ERROR)
+      log("Connection was closed", vim.log.ERROR)
       ServerWritePipe:disconnect()
       ServerReadPipe:disconnect()
+      config.connection.handle_broken_connection()
     end)
 end
 
 
--- A function to connect to the Unity named pipe.
 M.setup_connection = function()
   ServerWritePipe:setup(handle_closed_connection)
   ServerReadPipe:setup()
