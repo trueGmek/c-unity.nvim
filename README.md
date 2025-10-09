@@ -6,7 +6,7 @@ Tired of switching between Unity and Neovim? This plugin aims to streamline your
 
 ## Features
 
--   **Automatic Connection:** Automatically connects to the Unity Editor when a Unity project is detected.
+-   **Automatic Connection:** Automatically detects a Unity project in the current directory and attempts to connect to the Unity Editor. The connection is re-established automatically if it's lost.
 -   **View Unity Logs:** View logs from Unity in a floating window inside Neovim.
 -   **Syntax Highlighting:** Custom syntax highlighting for Unity logs, with support for warnings and errors.
 -   **Recompile Command:** Send a recompile command to Unity directly from Neovim.
@@ -40,9 +40,9 @@ The `setup` function can be called with a configuration table to override the de
 require("c-unity").setup({
     debug = false, -- Enable debug notifications
     loop = { -- Connection loop settings
-        timeout = 1000,
-        repeat_time = 1000,
-        limit = 100
+        timeout = 1000, -- Timeout in milliseconds for each connection attempt
+        repeat_time = 1000, -- Time in milliseconds between connection attempts
+        limit = 100 -- Maximum number of connection attempts
     },
     connection = { -- Pipe names
         server_read_pipe_name = "/tmp/unity-pipe-read",
@@ -61,7 +61,7 @@ require("c-unity").setup({
 
 ## Usage
 
-The plugin automatically detects a Unity project by looking for `Assets` and `ProjectSettings` directories. Once a project is detected, it will attempt to connect to the Unity Editor.
+The plugin automatically detects a Unity project by looking for `Assets` and `ProjectSettings` directories. Once a project is detected, it will attempt to connect to the Unity Editor. This check is also performed every time you change a directory.
 
 ### Commands
 
@@ -71,8 +71,14 @@ The plugin automatically detects a Unity project by looking for `Assets` and `Pr
 | `:CUDisconnect`| Disconnect from the Unity Editor. |
 | `:CUBuild`     | Send a recompile command to Unity.       |
 | `:CULog`       | Toggle the log window.          |
-| `:CULogs`      | Toggle the log window.          |
+| `:CULogs`      | Alias for `:CULog`.          |
 | `:CUClear`     | Clear the log window.           |
+
+## How it Works
+
+This plugin communicates with the Unity Editor using named pipes. The Unity plugin creates two named pipes, one for reading and one for writing. The Neovim plugin then connects to these pipes to send and receive messages.
+
+The communication protocol is based on JSON messages. The Neovim plugin sends commands to Unity (e.g., to recompile the project), and the Unity plugin sends logs and other information back to Neovim.
 
 ## Contributing
 
