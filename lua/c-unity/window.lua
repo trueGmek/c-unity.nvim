@@ -8,9 +8,6 @@ local config = require("c-unity.config")
 ---@type {window: window_data}
 local state = { window = { buf = -1, win = -1 } }
 
-vim.api.nvim_set_hl(0, 'cunityWarn', { fg = 'yellow', bg = 'NONE' })
-vim.api.nvim_set_hl(0, 'cunityError', { fg = 'red', bg = 'NONE' })
-
 local function create_buffer()
   local buf = vim.api.nvim_create_buf(false, true)
   vim.bo[buf].filetype = config.window.filetype
