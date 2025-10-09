@@ -3,7 +3,6 @@
 <div align="center">
 
 <img alt="Icon" height="280" src="icon.png" />
-<img alt="Icon" height="280" src="icon_2.png" />
 
 [![Lua](https://img.shields.io/badge/Lua-blue.svg?style=for-the-badge&logo=lua)](http://www.lua.org)
 [![Neovim](https://img.shields.io/badge/Neovim%200.5+-green.svg?style=for-the-badge&logo=neovim)](https://neovim.io)
