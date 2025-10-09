@@ -15,7 +15,7 @@ Tired of switching between Unity and Neovim? This plugin aims to streamline your
 
 ## Dependencies
 
-This plugin requires the accompanying plugin (*TBD*) to be running in your Unity project.
+This plugin requires the accompanying [plugin](https://github.com/trueGmek/com.gmek.c-unity) to be running in your Unity project.
 
 ## Installation
 
