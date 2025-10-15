@@ -9,9 +9,6 @@ local editor = require("c-unity.editor_handler")
 local utils = require("c-unity.utils")
 local log = utils.log
 
-M.window = window;
-M.pipe = pipe
-M.generator = generator
 
 ---@param opts {timeout: number, repeat_time: number, limit:integer}
 local function start_connection_loop(opts)
@@ -53,22 +50,16 @@ local handle_broken_connection = function()
   end)
 end
 
+M.window = window;
+M.pipe = pipe
+M.generator = generator
+M.editor = editor
 
 ---@param opts Config?
 M.setup = function(opts)
   config.set(opts)
   config.connection.handle_broken_connection = handle_broken_connection
-
-  vim.api.nvim_create_user_command('CULog', window.toggle, { desc = "Toggle logs window" })
-  vim.api.nvim_create_user_command('CULogs', window.toggle, { desc = "Toggle logs window" })
-  vim.api.nvim_create_user_command('CUClear', window.clear_buffer, { desc = 'Clear logs' })
-  vim.api.nvim_create_user_command('CUBuild', pipe.send_recomipile, { desc = "Send recompile command" })
-  vim.api.nvim_create_user_command('CUConnect', pipe.setup_connection, { desc = "Connect to Unity Server" })
-  vim.api.nvim_create_user_command('CUDisconnect', pipe.disconnect_from_unity, { desc = "Disconnect from Unity Server" })
-  vim.api.nvim_create_user_command('CUOpen', editor.open_project, { desc = "Open Unity Project" })
-
   vim.api.nvim_create_autocmd("DirChanged", { pattern = "*", callback = try_unity_project_startup })
-
   try_unity_project_startup()
 end
 
