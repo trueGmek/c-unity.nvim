@@ -38,7 +38,16 @@ You can install this plugin using your favorite plugin manager.
 use {
     "gmek/c-unity.nvim",
     config = function()
-        require("c-unity").setup()
+          local plugin = require("c-unity")
+          plugin.setup({ debug = false, unity = { path = "~/Unity/Hub/Editor/" } })
+
+          vim.api.nvim_create_user_command('CUOpen', plugin.editor.open_project, { desc = "Open Unity Project" })
+          vim.api.nvim_create_user_command('CULogs', plugin.window.toggle, { desc = "Toggle logs window" })
+          vim.api.nvim_create_user_command('CUClear', plugin.window.clear_buffer, { desc = 'Clear logs' })
+          vim.api.nvim_create_user_command('CUBuild', plugin.pipe.send_recomipile, { desc = "Send recompile command" })
+          vim.api.nvim_create_user_command('CUConnect', plugin.pipe.setup_connection, { desc = "Connect to Unity Server" })
+          vim.api.nvim_create_user_command('CUDisconnect', plugin.pipe.disconnect_from_unity,
+            { desc = "Disconnect from Unity Server" })
     end
 }
 ```
