@@ -36,6 +36,7 @@ local function start_connection_loop(opts)
 end
 
 
+---Checks if the current directory is a Unity project and starts the connection loop.
 ---@param opts {timeout: number, repeat_time: number, limit:integer}?
 local function try_unity_project_startup(opts)
   opts = opts or config.loop

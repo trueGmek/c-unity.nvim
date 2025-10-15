@@ -8,6 +8,7 @@ local config = require("c-unity.config")
 ---@alias packet_data {type:"command"|"response"|"log", id:string, payload:log_payload|response_payload}
 ---@alias window_data  {buf: integer, win:integer}
 
+---Manages the log window's state, including buffer and window IDs.
 ---@type {window: window_data}
 local state = { window = { buf = -1, win = -1 } }
 
@@ -78,7 +79,8 @@ local function append_text(buf, msg)
   vim.bo[buf].modifiable = false
 end
 
----@param data packet_data
+---Appends a log entry to the window.
+---@param data packet_data A `packet_data` table of type `log`.
 local append_log = function(data)
   local buf = state.window.buf
   local lines = { string.format("[%s][%s] %s", data.payload.timestamp, data.payload.level, data.payload.message) }
@@ -95,7 +97,8 @@ end
 -- [18:43:07][Unity] Status: SUCCESS, Message: 
 --response
 
----@param data packet_data
+---Appends a response message to the window.
+---@param data packet_data A `packet_data` table of type `response`.
 local append_response = function(data)
   local separator = "----"
   local buf = state.window.buf

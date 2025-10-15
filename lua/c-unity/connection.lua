@@ -71,6 +71,8 @@ ServerWritePipe.is_connected = function(self)
   return self.pipe_connection.handle and not self.pipe_connection.handle:is_closing()
 end
 
+---Handles incoming data from the Unity server.
+---Parses JSON packets and forwards them to the window module.
 ---@param data string
 local handle_data            = function(data)
   local lines = vim.split(data, '\n\n')
@@ -141,6 +143,8 @@ ServerWritePipe.disconnect     = function(self)
   self.pipe_connection = {}
 end
 
+---Callback for when the connection to the Unity server is closed.
+---Cleans up the pipe connections and calls the user-defined handler.
 local handle_closed_connection = function()
   vim.schedule(
     function()
