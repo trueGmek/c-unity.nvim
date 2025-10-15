@@ -66,6 +66,9 @@ require("c-unity").setup({
         relative = "editor",
         width_perct = 0.8,
         height_perct = 0.8,
+    },
+    unity = { -- Unity editor settings
+        path = "/path/to/your/unity/hub/or/editor" -- Path to the Unity executable
     }
 })
 ```
@@ -84,6 +87,7 @@ The plugin automatically detects a Unity project by looking for `Assets` and `Pr
 | `:CULog`       | Toggle the log window.          |
 | `:CULogs`      | Alias for `:CULog`.          |
 | `:CUClear`     | Clear the log window.           |
+| `:CUOpen`      | Open the Unity project.         |
 
 ## How it Works
 
