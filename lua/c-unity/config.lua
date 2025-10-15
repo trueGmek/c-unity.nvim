@@ -1,13 +1,16 @@
 local config = {}
 
 ---@class Config
----@field  debug boolean
----@field loop {timeout: number, repeat_time: number, limit:integer}
----@field connection {server_read_pipe_name: string, server_write_pipe_name: string, handle_broken_connection: function}
----@field window {border?: 'none'|'single'|'double'|'rounded'|'solid'|'shadow'|string[], width_perct:number, height_perct: number, filetype: string}
+---@field debug boolean?
+---@field loop {timeout: number, repeat_time: number, limit:integer}?
+---@field connection {server_read_pipe_name: string, server_write_pipe_name: string, handle_broken_connection: function}?
+---@field window {border?: 'none'|'single'|'double'|'rounded'|'solid'|'shadow'|string[], width_perct:number, height_perct: number, filetype: string}?
+---@field unity {path: string}
 
 
-config.debug = false
+-- Default values
+config.debug = true
+
 config.loop = {
   timeout = 1000,
   repeat_time = 5000,
@@ -29,6 +32,10 @@ config.window = {
   height_perct = 0.8,
 }
 
+config.unity = {
+  path = "",
+}
+
 ---@param opts Config | nil
 config.set = function(opts)
   opts = opts or {}
@@ -36,6 +43,7 @@ config.set = function(opts)
   config.loop = vim.F.if_nil(opts.loop, config.loop)
   config.connection = vim.F.if_nil(opts.connection, config.loop)
   config.window = vim.F.if_nil(opts.window, config.window)
+  config.unity = vim.F.if_nil(opts.unity, config.unity)
 end
 
 return config

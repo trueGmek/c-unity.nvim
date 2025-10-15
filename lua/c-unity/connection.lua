@@ -1,7 +1,7 @@
 local M = {}
 local window = require("c-unity.window")
 local config = require("c-unity.config")
-local log = require("c-unity.util").log
+local log = require("c-unity.utils").log
 local payload_gen = require("c-unity.payload_generator")
 
 
@@ -80,7 +80,7 @@ local handle_data            = function(data)
       if isOk then
         window.append_packet(result)
       else
-        log("Could not parse incoming information: " .. data, vim.log.levels.ERROR)
+        log("Could not parse incoming information: " .. data, vim.log.levels.WARN)
       end
     end)
   end
@@ -147,8 +147,7 @@ local handle_closed_connection = function()
       log("Connection was closed", vim.log.ERROR)
       ServerWritePipe:disconnect()
       ServerReadPipe:disconnect()
-      config.connection.handle_broken_connection()
-    end)
+      config.connection.handle_broken_connection() end)
 end
 
 
