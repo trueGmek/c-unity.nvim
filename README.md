@@ -38,19 +38,37 @@ You can install this plugin using your favorite plugin manager.
 use {
     "gmek/c-unity.nvim",
     config = function()
-          local plugin = require("c-unity")
-          plugin.setup({ debug = false, unity = { path = "~/Unity/Hub/Editor/" } })
-
-          vim.api.nvim_create_user_command('CUOpen', plugin.editor.open_project, { desc = "Open Unity Project" })
-          vim.api.nvim_create_user_command('CULogs', plugin.window.toggle, { desc = "Toggle logs window" })
-          vim.api.nvim_create_user_command('CUClear', plugin.window.clear_buffer, { desc = 'Clear logs' })
-          vim.api.nvim_create_user_command('CUBuild', plugin.pipe.send_recomipile, { desc = "Send recompile command" })
-          vim.api.nvim_create_user_command('CUConnect', plugin.pipe.setup_connection, { desc = "Connect to Unity Server" })
-          vim.api.nvim_create_user_command('CUDisconnect', plugin.pipe.disconnect_from_unity,
-            { desc = "Disconnect from Unity Server" })
+        require("c-unity").setup()
     end
 }
 ```
+
+### Lazy
+
+```lua
+{
+    "gmek/c-unity.nvim",
+    config = function()
+        require("c-unity").setup()
+    end,
+},
+```
+
+## Commands
+
+The plugin does not create any commands by default. You can create them yourself as follows:
+
+```lua
+local plugin = require("c-unity")
+
+vim.api.nvim_create_user_command('CUOpen', plugin.editor.open_project, { desc = "Open Unity Project" })
+vim.api.nvim_create_user_command('CULogs', plugin.window.toggle, { desc = "Toggle logs window" })
+vim.api.nvim_create_user_command('CUClear', plugin.window.clear_buffer, { desc = 'Clear logs' })
+vim.api.nvim_create_user_command('CUBuild', plugin.pipe.send_recomipile, { desc = "Send recompile command" })
+vim.api.nvim_create_user_command('CUConnect', plugin.pipe.setup_connection, { desc = "Connect to Unity Server" })
+vim.api.nvim_create_user_command('CUDisconnect', plugin.pipe.disconnect_from_unity, { desc = "Disconnect from Unity Server" })
+```
+
 
 ## Configuration
 
@@ -86,17 +104,7 @@ require("c-unity").setup({
 
 The plugin automatically detects a Unity project by looking for `Assets` and `ProjectSettings` directories. Once a project is detected, it will attempt to connect to the Unity Editor. This check is also performed every time you change a directory.
 
-### Commands
-
-| Command        | Description                     |
-| -------------- | ------------------------------- |
-| `:CUConnect`   | Manually connect to the Unity Editor.    |
-| `:CUDisconnect`| Disconnect from the Unity Editor. |
-| `:CUBuild`     | Send a recompile command to Unity.       |
-| `:CULog`       | Toggle the log window.          |
-| `:CULogs`      | Alias for `:CULog`.          |
-| `:CUClear`     | Clear the log window.           |
-| `:CUOpen`      | Open the Unity project.         |
+See the [Commands](#commands) section for a list of available commands and how to create them.
 
 ## How it Works
 
